@@ -1,47 +1,27 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html>
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mini WebRTC</title>
-  <link rel="stylesheet" href="./style.css" />
+    <style>
+        #videoGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">Mini WebRTC</div>
-    <div class="status">
-      <span id="connectionDot" class="dot"></span>
-      <span id="connectionText">Conectando…</span>
+    <div id="videoGrid">
+        <video id="localVideo" autoplay playsinline muted></video>
     </div>
-  </header>
-
-  <main class="layout">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <h3>Participantes</h3>
-        <span id="count">0</span>
-      </div>
-      <ul id="participants"></ul>
-    </aside>
-
-    <section class="stage">
-      <div id="videos" class="videos-grid">
-        <!-- aquí se insertará el <video> local con data-self="1" -->
-      </div>
-
-      <div class="toolbar">
-        <button id="btnMute"    class="btn" title="Silenciar micrófono (M)">🔇</button>
-        <button id="btnCam"     class="btn" title="Apagar cámara (V)">📷</button>
-        <button id="btnShare"   class="btn" title="Compartir pantalla (S)">🖥️</button>
-        <button id="btnLayout"  class="btn" title="Cambiar layout">🧩</button>
-        <button id="btnLeave"   class="btn danger" title="Salir (Q)">🚪</button>
-      </div>
-    </section>
-  </main>
-
-  <!-- Reintento de medios (por permisos) -->
-  <button id="btnRetry" class="btn retry">Reintentar cámara/mic</button>
-
-  <script type="module" src="./script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
+
 </html>
