@@ -3,8 +3,8 @@ const path = require('path');
 
 const app = express();
 const staticDir = path.join(__dirname, 'src');
-app.use(express.static(staticDir));
 
+app.use(express.static(staticDir));
 app.get('/', (_req, res) => res.sendFile(path.join(staticDir, 'index.html')));
 app.get('*', (_req, res) => res.sendFile(path.join(staticDir, 'index.html')));
 
