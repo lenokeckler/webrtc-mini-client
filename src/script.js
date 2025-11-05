@@ -1,66 +1,36 @@
-import config from './config.js';
-// si ya tienes tu inicialización, conserva lo tuyo:
-window.addEventListener('DOMContentLoaded', () => {
-  // Atajos de UI
-  const $ = s => document.querySelector(s);
-  const on = (id, fn) => $(id)?.addEventListener('click', fn);
+const showRetry = (show=true) => {
+  const b = document.getElementById('btnRetry');
+  if (b) b.style.display = show ? 'inline-block' : 'none';
+};
 
-  // ESTADO de botones
-  const btnMute = $('#btnMute');
-  const btnCam  = $('#btnCam');
-  const btnShare= $('#btnShare');
-  const btnLeave= $('#btnLeave');
-  const btnLayout = $('#btnLayout');
-
-  // Ejemplos: ajusta si tu objeto es distinto
-  on('#btnMute', () => {
-    const muted = window.app.webrtc.toggleMic();
-    btnMute.classList.toggle('active', muted);
-    btnMute.title = muted ? 'Activar micrófono (M)' : 'Silenciar (M)';
-  });
-
-  on('#btnCam', () => {
-    const off = window.app.webrtc.toggleCam();
-    btnCam.classList.toggle('active', off);
-    btnCam.title = off ? 'Encender cámara (V)' : 'Apagar cámara (V)';
-    // espejar solo local si quieres
-    const local = document.querySelector('#videos video[data-self="1"]');
-    if(local) local.classList.toggle('mirror', !off);
-  });
-
-  let sharing = false;
-  on('#btnShare', async () => {
-    if(!sharing){
-      await window.app.webrtc.startScreenShare();
-      sharing = true;
-      btnShare.classList.add('active');
-    }else{
-      window.app.webrtc.stopScreenShare();
-      sharing = false;
-      btnShare.classList.remove('active');
+async function ensureLocalMedia() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true },
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
+    });
+    // Asegura autoplay:
+    let v = document.querySelector('#videos video[data-self="1"]');
+    if (!v) {
+      v = document.createElement('video');
+      v.autoplay = true; v.muted = true; v.playsInline = true; v.dataset.self = '1';
+      document.getElementById('videos')?.prepend(v);
     }
-  });
+    v.srcObject = stream;
+    v.addEventListener('loadedmetadata', () => v.play().catch(()=>{}));
 
-  on('#btnLeave', () => {
-    window.app.webrtc.closeAll();
-    window.app.ws?.disconnect?.();
-    location.reload();
-  });
+    // pasa el stream a tu lógica existente (ajusta nombre según tu app)
+    window.app?.webrtc?.setLocalStream?.(stream);
 
-  // Cambiar layout (ej: forzar 1 columna vs auto-fit)
-  let alt = false;
-  on('#btnLayout', () => {
-    const grid = document.getElementById('videos');
-    alt = !alt;
-    grid.style.gridTemplateColumns = alt ? 'repeat(1, minmax(240px, 1fr))' : '';
-  });
+    showRetry(false);
+  } catch (err) {
+    console.error(err);
+    alert(`No se pudo acceder: ${err.name}. Revisa permisos y vuelve a intentar.`);
+    showRetry(true);
+  }
+}
 
-  // Atajos de teclado
-  document.addEventListener('keydown', (e) => {
-    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if(e.key.toLowerCase()==='m') btnMute?.click();
-    if(e.key.toLowerCase()==='v') btnCam?.click();
-    if(e.key.toLowerCase()==='s') btnShare?.click();
-    if(e.key.toLowerCase()==='q') btnLeave?.click();
-  });
-});
+document.getElementById('btnRetry')?.addEventListener('click', ensureLocalMedia);
+
+// Llama a ensureLocalMedia() al iniciar tu app (después de crear window.app)
+ensureLocalMedia();
