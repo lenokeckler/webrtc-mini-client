@@ -26,11 +26,11 @@
 
     <section class="stage">
       <div id="videos" class="videos-grid">
-        <!-- aquí se insertan <video> locales y remotos -->
+        <!-- aquí se insertará el <video> local con data-self="1" -->
       </div>
 
       <div class="toolbar">
-        <button id="btnMute"    class="btn" title="Silenciar (M)">🔇</button>
+        <button id="btnMute"    class="btn" title="Silenciar micrófono (M)">🔇</button>
         <button id="btnCam"     class="btn" title="Apagar cámara (V)">📷</button>
         <button id="btnShare"   class="btn" title="Compartir pantalla (S)">🖥️</button>
         <button id="btnLayout"  class="btn" title="Cambiar layout">🧩</button>
@@ -38,6 +38,9 @@
       </div>
     </section>
   </main>
+
+  <!-- Reintento de medios (por permisos) -->
+  <button id="btnRetry" class="btn retry">Reintentar cámara/mic</button>
 
   <script type="module" src="./script.js"></script>
 </body>
